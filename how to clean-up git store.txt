@@ -1,7 +1,0 @@
-git checkout --orphan latest_branch
-git add -A
-git commit -am “초기 커밋 메세지” #변경내용 커밋
-git branch -D master #마스터 브랜치 삭제
-git branch -m master #브랜치 이름을 마스터로 변경
-git push -f origin master #마스터 브랜치로 푸시
-git gc --aggressive --prune=all #오래된 파일 삭제
