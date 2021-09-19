@@ -1,0 +1,67 @@
+Graphcore Poplar, PopArt 1.3 Version
+Tensorflow 2.1 Version
+apt update -y
+apt install curl wget git nano -y
+root@4929bbb474f5:/# jupyter --version jupyter core : 4.6.3
+jupyter-notebook : 6.1.4
+qtconsole : 4.7.7
+ipython : 7.16.1
+ipykernel : 5.3.4
+jupyter client : 6.1.7
+jupyter lab : not installed
+nbconvert : 5.4.1
+ipywidgets : 7.5.1
+nbformat : 5.0.8
+traitlets : 4.3.3
+
+$ docker pull mkbahk/gc-poplar13-tensorflow2-jupyter:mzc-mkbahk-20201025
+로 pull한 후
+
+$ gc-docker -- -ti mkbahk/gc-poplar13-tensorflow2-jupyter:mzc-mkbahk-20201025 /bin/bash
+
+로 기동합니다.
+
+$ jupyter notebook --ip=0.0.0.0 --port=xxxx --allow-root &
+
+명령으로 주피터 노트북을 수행합니다. "xxxx"는 오픈할 포트번호 입니다.
+
+
+구체적으로 접근방법은 아래의 내용을 예로 참조하세요.
+
+
+[도커내의 jupyter notebook접근하는 방법]
+
+$ docker inspect {콘테이너ID} | grep IPAddress
+"SecondaryIPAddresses": null, "IPAddress": "172.17.0.x", "IPAddress": "172.17.0.x",
+
+
+$ sudo iptables -A DOCKER -p tcp --dport xxxx -j ACCEPT -d 172.17.0.x
+$ sudo iptables -t nat -A DOCKER -p tcp --dport xxxx -j DNAT --to 172.17.0.x:xxxx
+$ sudo iptables -t nat -A POSTROUTING -p tcp --dport xxxx -j MASQUERADE -s 172.17.0.x -d 172.17.0.x
+$ sudo iptables -t nat -nL
+
+
+아래와 유사하게 나옵니다.
+Chain DOCKER (1 references) target prot opt source destination
+ACCEPT tcp -- 0.0.0.0/0 172.17.0.x tcp dpt:xxxx
+Chain POSTROUTING (policy ACCEPT) target prot opt source destination
+MASQUERADE all -- 172.17.0.0/16 0.0.0.0/0
+MASQUERADE tcp -- 172.17.0.x 172.17.0.x tcp dpt:xxxx
+Chain DOCKER (2 references) target prot opt source destination
+RETURN all -- 0.0.0.0/0 0.0.0.0/0
+DNAT tcp -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:xxxx to:172.17.0.x:xxxx
+
+
+[도커안에서 jupyter-notebook실행]
+root@bad3da9c3d34:/# jupyter notebook --ip=0.0.0.0 --port=xxxx --allow-root &
+
+
+To access the notebook, open this file in a browser:
+file:///root/.local/share/jupyter/runtime/nbserver-25-open.html
+Or copy and paste one of these URLs:
+http://bad3da9c3d34:xxxx/?token=6ad47b1335106ca93bf28e7a2916925ad10ffa886cfaf67e
+or http://127.0.0.1:xxxx/?token=6ad47b1335106ca93bf28e7a2916925ad10ffa886cfaf67e
+
+
+[브라우저에서 접속하는 방법]
+http://호스트ip:xxxx/?token=6ad47b1335106ca93bf28e7a2916925ad10ffa886cfaf67e

@@ -1,0 +1,10 @@
+--------------------------------------------------------------------------
+mpiexec was unable to launch the specified application as it could not access
+or execute an executable:
+
+Executable: ./hellompi
+Node: host202
+
+while attempting to start process rank 4.
+--------------------------------------------------------------------------
+4 total processes failed to start

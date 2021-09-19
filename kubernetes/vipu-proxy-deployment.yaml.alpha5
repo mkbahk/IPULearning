@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ipu-operator.fullname" . }}-vipu-proxy
+  labels:
+    {{- include "ipu-operator.labels" . | nindent 4 }}
+    app.kubernetes.io/component: vipu-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "ipu-operator.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: vipu-proxy
+  template:
+    metadata:
+    {{- with .Values.vipuProxy.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "ipu-operator.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: vipu-proxy
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "ipu-operator.vipuProxy.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.vipuProxy.podSecurityContext | nindent 8 }}
+      containers:
+        - name: vipu-proxy
+          securityContext:
+            {{- toYaml .Values.vipuProxy.securityContext | nindent 12 }}
+          image: "{{ .Values.vipuProxy.image.repository }}:{{ .Values.vipuProxy.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.vipuProxy.image.pullPolicy }}
+          env:
+            - name: VIPU_SERVER_ADDR
+              value: {{ include "ipu-operator.fullname" . }}-vipu-server
+            - name: VIPU_SERVER_PORT
+              value: {{ .Values.global.vipuServerPort | quote }} 
+            - name: VIPU_CLUSTER_NAME
+              value: {{ .Values.global.vipuClusterName }}    
+            - name: PROXY_PORT
+              value:  {{ .Values.vipuProxy.proxyPort | default 8080 | quote }} 
+           {{- if .Values.vipuProxy.proxyWriteTimeoutSeconds }}
+            - name: PROXY_WRITE_TIMEOUT
+              value:  {{ .Values.vipuProxy.proxyWriteTimeoutSeconds | quote }}
+           {{- end }} 
+           {{- if .Values.vipuProxy.proxyReadTimeoutSeconds }}
+            - name: PROXY_READ_TIMEOUT
+              value:  {{ .Values.vipuProxy.proxyReadTimeoutSeconds | quote }}
+           {{- end }} 
+           {{- if .Values.vipuProxy.proxyIdleTimeoutSeconds }}
+            - name: PROXY_IDLE_TIMEOUT
+              value:  {{ .Values.vipuProxy.proxyIdleTimeoutSeconds | quote }}
+           {{- end }}  
+            - name: PROXY_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace  
+          {{- if .Values.vipuProxy.logLevel }}
+          args:
+          - -v={{ .Values.vipuProxy.logLevel }}   
+          {{- end }}    
+          ports:
+            - name: http
+              containerPort: {{ .Values.vipuProxy.proxyPort | default 8080 }}
+              protocol: TCP
+          livenessProbe:
+#            httpGet:
+#              path: /health
+#              port: http
+          readinessProbe:
+#           httpGet:
+#              path: /health
+#              port: http
+          resources:
+            {{- toYaml .Values.vipuProxy.resources | nindent 12 }}
+      {{- with .Values.vipuProxy.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.vipuProxy.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.vipuProxy.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

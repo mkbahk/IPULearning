@@ -1,0 +1,205 @@
+# Default values for ipu-operator.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# these options determine the naming used for the helm release and the generated kubernetes resources
+# -- Used to override the Chart name in the generated names for the Kubernetes resources created by this chart. 
+nameOverride: ""
+# -- Used to override the entire generated names for the Kubernetes resources created by this chart.
+fullnameOverride: ""
+
+# this is applied to all components below
+global:
+  # -- A map of secret names that should be used to pull images. Each element in the map should follow the format: name: "<secret-name>".
+  imagePullSecrets: 
+    - name: "rtf-docker-registry"
+
+  # -- The FQDN name of the V-IPU server host.
+  vipuServerAddr: 211.214.213.60
+  # -- The port at which the V-IPU server is listening. 
+  vipuServerPort: 8090
+  # -- The V-IPU cluster that should be used.
+  vipuClusterName: mzc-cl-torus
+  # -- The container image used for each mpijob launcher init container. 
+  launcherImage: artifactory-systems.eng.graphcore.ai/vipu-k8s-docker-dev-local/launcher
+
+# IPU operator's controller
+controller:
+  # -- Specifies whether to enable or disable development logging mode.
+  develLogs: false 
+  image:
+    # -- The Controller image repository
+    repository: artifactory-systems.eng.graphcore.ai/vipu-k8s-docker-dev-local/controller 
+    # -- Overrides the Controller image tag whose default is the chart appVersion.
+    # -- The Controller image pull policy
+    pullPolicy: IfNotPresent
+    # -- Overrides the Controller image tag whose default is the chart appVersion.
+    tag: ""
+    
+  serviceAccount:
+    # -- Specifies whether a service account should be created.
+    create: true
+    # -- Annotations to add to the service account.
+    annotations: {}
+    # -- The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template.
+    name: ""
+
+  rbac:
+    # -- Specifies whether to create rbac clusterrole and clusterrolebinding and attach them to the service account.
+    create: true  
+
+  service:
+    # -- The Kubernetes service type for the controller.
+    type: ClusterIP
+    # -- The port for the controller service.
+    port: 8443
+
+  resources: 
+    limits:
+      # -- The max limit for CPU for the controller.
+      cpu: 500m
+      # -- The max limit for memory for the controller.
+      memory: 512Mi
+    requests:
+      # -- The requested CPU for the controller.
+      cpu: 100m
+      # -- The requested memory for the controller.
+      memory: 200Mi
+
+  # -- Controller pod annotations.
+  podAnnotations: {}
+
+  # -- Controller pod security policy.
+  podSecurityContext: 
+    runAsUser: 65532
+  
+  # -- Controller security context.
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  # -- Controller Kubernetes node selector.
+  nodeSelector: {kubernetes.io/hostname: ipu-pod16-mgmt}
+
+  # -- Controller Kubernetes tolerations. See https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+  tolerations: []
+
+  # -- Controller Kubernetes affinity. See https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/
+  affinity: {} 
+
+vipuProxy:
+  image:
+    # -- The V-IPU proxy image repository.
+    repository: artifactory-systems.eng.graphcore.ai/vipu-k8s-docker-dev-local/vipu-proxy
+    # -- The V-IPU proxy image pull policy.
+    pullPolicy: IfNotPresent
+    # -- Overrides V-IPU proxy the image tag whose default is the chart appVersion.
+    tag: ""
+  # -- V-IPU proxy  partition tracking configmap name.
+  proxyPartitionTrackerConfigMap: ipu-partitions-tracker
+  # -- V-IPU proxy write timeout in seconds.
+  proxyWriteTimeoutSeconds: 300
+  # -- V-IPU proxy read timeout in seconds.
+  proxyReadTimeoutSeconds: 30
+  # -- V-IPU proxy idle timeout seconds.
+  proxyIdleTimeoutSeconds: 60 
+  # -- V-IPU proxy port.
+  proxyPort: 8080
+  # -- V-IPU proxy log level (min 1 -max 6).
+  logLevel: 2 
+
+  serviceAccount:
+    # -- Specifies whether a service account should be created for V-IPU proxy.
+    create: true
+    # -- Annotations to add to the service account for V-IPU proxy.
+    annotations: {}
+    # -- The name of the service account to use for V-IPU proxy.
+    # If not set and create is true, a name is generated using the fullname template.
+    name: ""
+
+  rbac:
+    # -- Specifies whether to create rbac clusterrole and clusterrolebinding and attach them to the service account for V-IPU proxy.
+    create: true 
+
+  service:
+    # -- The Kubernetes service type for V-IPU proxy.
+    type: ClusterIP
+    # -- The Kubernetes service port for V-IPU proxy.
+    port: 80
+  # -- The Kubernetes resources limits and requirements for V-IPU proxy.
+  resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi  
+
+  # -- The V-IPU proxy pod annotations.
+  podAnnotations: {}
+
+  # -- The V-IPU proxy pod security policy.
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  # -- The V-IPU proxy security context.
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  # -- The V-IPU proxy Kubernetes node selector.
+  nodeSelector: {kubernetes.io/hostname: ipu-pod16-mgmt}
+
+  # -- The V-IPU proxy Kubernetes tolerations. See https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+  tolerations: []
+
+  # -- The V-IPU proxy Kubernetes affinity. See https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/
+  affinity: {}
+
+admissionWebhooks:
+  # -- The admission webhooks timeout in seconds.
+  timeoutSeconds: 30 
+  # -- The admission webhooks failure policy.
+  failurePolicy: Fail
+  # -- The port at which the admission webhook server is exposed in the controller container.
+  port: 9443
+
+  service:
+    # -- The admission webhooks service annotations.
+    annotations: {}
+    # -- The admission webhooks service port.
+    servicePort: 443
+    # -- The admission webhooks service type.
+    type: ClusterIP
+
+  patch:
+    image:
+      # -- The admission webhooks patch image repository.
+      repository: docker.io/jettech/kube-webhook-certgen
+      # -- The admission webhooks patch image tag.
+      tag: v1.3.0
+      # -- The admission webhooks patch image pull policy.
+      pullPolicy: IfNotPresent
+    # -- The name of a priority class to use with the admission webhook patching job.
+    priorityClassName: ""
+    # -- The pod annotations for the admission webhooks patch jobs.
+    podAnnotations: {}
+    # -- The Kubernetes node selector for the admission webhooks patch jobs.
+    nodeSelector: {}
+    # -- The Kubernetes tolerations for the admission webhooks patch jobs. See https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+    tolerations: []
+    # -- The User to use for the admission webhooks patch jobs.
+    runAsUser: 2000

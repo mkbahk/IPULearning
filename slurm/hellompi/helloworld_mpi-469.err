@@ -1,0 +1,12 @@
+[host201:19672] [[24902,0],0] usock_peer_send_blocking: send() to socket 39 failed: Broken pipe (32)
+[host201:19672] [[24902,0],0] ORTE_ERROR_LOG: Unreachable in file oob_usock_connection.c at line 316
+[host201:19672] [[24902,0],0]-[[24902,1],0] usock_peer_accept: usock_peer_send_connect_ack failed
+[host201:19672] [[24902,0],0] usock_peer_send_blocking: send() to socket 44 failed: Broken pipe (32)
+[host201:19672] [[24902,0],0] ORTE_ERROR_LOG: Unreachable in file oob_usock_connection.c at line 316
+[host201:19672] [[24902,0],0]-[[24902,1],2] usock_peer_accept: usock_peer_send_connect_ack failed
+[host201:19672] [[24902,0],0] usock_peer_send_blocking: send() to socket 45 failed: Broken pipe (32)
+[host201:19672] [[24902,0],0] ORTE_ERROR_LOG: Unreachable in file oob_usock_connection.c at line 316
+[host201:19672] [[24902,0],0]-[[24902,1],1] usock_peer_accept: usock_peer_send_connect_ack failed
+[host201:19672] [[24902,0],0] usock_peer_send_blocking: send() to socket 46 failed: Broken pipe (32)
+[host201:19672] [[24902,0],0] ORTE_ERROR_LOG: Unreachable in file oob_usock_connection.c at line 316
+[host201:19672] [[24902,0],0]-[[24902,1],3] usock_peer_accept: usock_peer_send_connect_ack failed

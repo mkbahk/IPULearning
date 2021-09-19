@@ -1,0 +1,180 @@
+# 도커설치
+
+apt-get update
+apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+apt-get update
+apt-get install docker-ce docker-ce-cli containerd.io
+
+#도커 정상설치 테스트
+docker run hello-world
+
+#kubectl 설치
+curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.15.0/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+mv ./kubectl /usr/local/bin/kubectl
+
+#minikube 설치
+curl -Lo minikube https://storage.googleapis.com/minikube/releases/v1.2.0/minikube-linux-amd64
+
+chmod +x minikube
+cp minikube /usr/local/bin/
+rm minikube
+
+
+minikube start --vm-driver=none --cpus 20 --memory 256000 --disk-size=120g --extra-config=apiserver.authorization-mode=RBAC --extra-config=kubelet.resolv-conf=/run/systemd/resolve/resolv.conf --extra-config kubeadm.ignore-preflight-errors=SystemVerification
+
+#minikube 관련 명령어
+minikube stop
+minikube delete
+
+#그다음 minikube로 설치된 모든 docker image 삭제
+docker rmi -f $(docker image ls -q -aq)
+
+
+
+
+mkdir -p /root/kubeflow/v1.0.2
+cd /root/kubeflow/v1.0.2
+wget https://github.com/kubeflow/kfctl/releases/download/v1.0.2/kfctl_v1.0.2-0-ga476281_linux.tar.gz
+tar -xvf kfctl_v1.0.2-0-ga476281_linux.tar.gz
+mv kfctl /usr/bin
+kfctl version
+		
+
+
+nano sc.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: Immediate
+
+kubectl apply -f sc.yaml
+kubectl get sc
+kubectl patch storageclass local-storage -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+kubectl describe sc
+
+sudo mkdir /mnt/pv{1..5}
+
+nano pv.yaml  
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-volume1
+  labels:
+    type: local
+spec:
+  storageClassName: local-storag
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/pv1"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-volume2
+  labels:
+    type: local
+spec:
+  storageClassName: local-storag
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/pv2"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-volume3
+  labels:
+    type: local
+spec:
+  storageClassName: local-storag
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/pv3"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-volume4
+  labels:
+    type: local
+spec:
+  storageClassName: local-storag
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/pv4"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-volume5
+  labels:
+    type: local
+spec:
+  storageClassName: local-storag
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/pv5"
+---
+
+kubectl apply -f pv.yaml
+kubectl get pv
+
+
+export PATH=$PATH:/root/kubeflow/v1.0.2
+export KF_NAME=mzc-kubeflow
+export BASE_DIR=/root/kubeflow/v1.0.2
+export KF_DIR=${BASE_DIR}/${KF_NAME}
+export CONFIG_URI="https://raw.githubusercontent.com/kubeflow/manifests/v1.0.0-branch/kfdef/kfctl_k8s_istio.v1.0.0.yaml"
+
+mkdir -p ${KF_DIR}
+cd ${KF_DIR}
+kfctl apply -V -f ${CONFIG_URI}
+
+
+kubectl -n kubeflow get pvc
+
+
+NAME             STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+katib-mysql      Pending                                                     13m
+metadata-mysql   Pending                                                     13m
+minio-pv-claim   Pending                                                     13m
+mysql-pv-claim   Pending                                                     13m
+
+
+kubectl -n kubeflow describe pvc minio-pvc
+kubectl get pvc -o custom-columns='name:{.metadata.name},storage:{.spec.resources.requests.storage}' -n kubeflow
+kubectl describe sc
+
+
+kubectl get service -n istio-system
+http://106.246.237.171:31380/
+
+
+export INGRESS_HOST=$(minikube ip)
+export INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}')
+
+

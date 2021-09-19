@@ -1,0 +1,187 @@
+//--------------------------------------------------------------------------------//
+//   Graphcore IPU Driver, Poplar Lib, Tensorflow, Pytorch, PopArt Framework 설치  //
+//--------------------------------------------------------------------------------//
+
+//필요한 파일들은 /mnt/GC-SDK 디렉토리에 있습니다.
+// /mnt/GC-SDK에 있는 사용할 sdk버젼을 자신의 로컬 홈에 복사하세요
+tar -zxvf poplar_sdk-ubuntu_18_04-버젼.tar.gz
+cd poplar_sdk-ubuntu_18_04-버젼
+
+// SDK 1.4 버젼 예로 사용자 홈이 /localdata/newhome/$USER/... 에 만들어진 경우
+export TF_POPLAR_FLAGS=--executable_cache_path=~/tmp/
+export TMPDIR=~/tmp/
+#source ~/poplar_sdk-ubuntu_18_04-1.4.0+365-665f971c8f/gc_kernel-module-ubuntu_18_04-1.0.47+10706-b9b63c1e81pkg/driver_load.sh
+source ~/poplar_sdk-ubuntu_18_04-1.4.0+365-665f971c8f/poplar-ubuntu_18_04-1.4.0+71819-c5c0c8ebab/enable.sh
+source ~/poplar_sdk-ubuntu_18_04-1.4.0+365-665f971c8f/popart-ubuntu_18_04-1.4.0+5352-e86081acc9/enable.sh
+
+// SDK 2.0 버젼
+# set Graphcore IPU SDK 2.0
+export TF_POPLAR_FLAGS=--executable_cache_path=~/tmp/
+export TMPDIR=~/tmp/
+#source ~/poplar_sdk-ubuntu_18_04-2.0.0+481-79b41f85d1/gc_kernel-module-ubuntu_18_04-1.0.50+18673-b76151275c/pkg/driver_load.sh
+source ~/poplar_sdk-ubuntu_18_04-2.0.0+481-79b41f85d1/popart-ubuntu_18_04-2.0.0+108156-165bbd8a64/enable.sh
+source ~/poplar_sdk-ubuntu_18_04-2.0.0+481-79b41f85d1/poplar-ubuntu_18_04-2.0.0+108156-165bbd8a64/enable.sh
+
+//root 사용자가 driver를 설치할 때 dkms관련 에러가 발생하면
+apt install dkms -y
+
+//driver 정상설치 확인명령, driver는 Superuser 권한을 가진 사람이 한번만 수행해 주면 개별 사용자는 재-수행없이 공유로 사용할 수 있습니다.
+modinfo ipu_driver
+
+//poplar 정상설치 확인명령
+popc --version
+
+//popart 정상설치 확인명령
+python3
+import popart
+print(popart.__version__)
+
+//IPU Driver, SDK가 정상적으로 올라갔는지 확인하는 명령, 시스템에 설치된 IPU에 대한 정보표시
+gc-monitor
+//실-시간으로 어느 사용자가 IPU 자원을 사용하고 있는 것을 지속적으로 확인하고 싶으시면 
+watch -n 1 gc-monitor
+
+//------------------------------------------
+// python 가상환경을 만들어서 사용하세요.
+//------------------------------------------
+pip install -U pip
+python3 -m venv ./venv_poplar1.3
+source ./venv_poplar1.3/bin/activate
+
+//------------------------------------------
+// tensorflow 2.1버젼을 설치해 주세요.
+//------------------------------------------
+pip3 install wheel
+pip3 install gc_tensorflow-2.1.0+1.3.30___intel_skylake512____-linux_x86_64.whl
+
+//tensorflow 정상동작 확인 
+python3
+import tensorflow as tf
+print(tf.__version__)
+
+//git에서 Graphcore IPU 정상동작 확인할 수 있는 Sample 모델을 다운받으세요.
+git clone https://github.com/mkbahk/graphcore-ipu-demo
+git clone https://github.com/graphcore/examples.git graphcore_github_examples
+
+//코드실행 예)
+python3 mnist-ipu-dest.py
+
+//모델 실행 시 IPU사용을 확인하기 위해
+watch -n 1 gc-monitor --no-card-info
+
+
+//------------------------------------------
+// jupyter Notebook 을 사용하실 분들은 
+//------------------------------------------
+pip3 install jupyter
+
+// jupyter Notebook실행 후 새로 python3 문서만들겠다고 했을 때 "500 Internal Server Error" 대응법
+pip3 install --upgrade "ipython[all]"
+pip3 install nbconvert==5.4.1
+
+//xxxx는 포트번호입니다.1024 이상 번호를 사용하세요.
+jupyter notebook --ip=0.0.0.0 --port=xxxx --allow-root & 
+예) jupyter notebook --ip=0.0.0.0 --port=8899 --allow-root & 
+
+//------------------------------------------
+// gc-profile 사용할 경우 옵션으로 설치가능
+//------------------------------------------
+pip3 install gc-profile-0.8.5-py3-none-any.whl
+gc-profile -d ./profile/ -- python3 xxx.py
+
+
+//-------------------------------------------------------
+// 가상환경과 SDK소프트웨어도 설치하기 싫으면 바로 Docker 사용가능, 이미 관리자가 Docker Image를 설치해 두었습니다. 
+// docker를 수행하기 전에 이미 운영체체 수준에서 ipu-driver만은 설치되어있어야 합니다.
+//------------------------------------------
+
+docker images
+
+//없으면,
+docker load -i poplar-docker-images-1.0.136.tar.gz
+
+//일반 docker run으로 기동하면 gc-monitor시 ipu가 보이지 않습니다. 
+//Ctrl+P,Q(대문자)로 exit()하지 않고 잠시 linux shell로 빠져나옴, 
+//다시 접속하고 싶으면 docker attach "Container_ID"
+gc-docker -- -ti graphcore/tensorflow:2-intel-1.3.0-bionic-20200903 /bin/bash
+gc-docker -- --rm -ti graphcore/tensorflow:2-intel-1.3.0-bionic-20200903 /bin/bash
+
+//gc-docker 명령은 nvidia-docker 처럼 ipu를 자동적으로 물고 올라가기 위한 docker명령의 wrapper명령입니다.
+gc-docker --device-id 0 -- -ti graphcore/tools gc-inventory
+
+docker run --device=/dev/ipu0:/dev/ipu0 --device=/dev/ipu0_ex:/dev/ipu0_ex --device=/dev/ipu0_mailbox:/dev/ipu0_mailbox --device=/dev/ipu0_mem:/dev/ipu0_mem -ti graphcore/tools gc-inventory
+
+//ipu을 low-level로 물고 올라가면서, 로컬시스템의 /home/mkbahk/graphcore-ipu-demo 폴더를 Container내부의 /home/graphcore-ipu-demo로 마운팅하여 바로 사용가능토록 수행
+docker run --device=/dev/ipu4:/dev/ipu4 --device=/dev/ipu4_ex:/dev/ipu4_ex -ti -v /home/mkbahk/graphcore-ipu-demo:/home/graphcore-ipu-demo  30ae7ba65b4f /bin/bash
+
+
+
+gc-docker -- -ti --dns="8.8.8.8" graphcore/tensorflow:2-intel-1.3.0-bionic-20200903 /bin/bash
+gc-docker -- --rm -ti --dns="8.8.8.8" graphcore/tensorflow:2-intel-1.3.0-bionic-20200903 /bin/bash
+
+//주의사항....주의사항....주의사항....주의사항....주의사항....
+//docker 내부에 들어가면 처음 반드시 "apt update -y"해야 git 설치가 가능합니다.
+apt udpate -y
+apt install curl wget git -y
+git clone https://github.com/graphcore/examples.git graphcore_github_examples
+git clone https://github.com/mkbahk/graphcore-ipu-demo
+
+gc-docker --device-id 4 -- --rm -ti graphcore/tools gc-inventory
+gc-docker --echo --device-id 4 -- --rm -ti graphcore/tools gc-inventory
+
+
+gc-docker -- -ti -v /home/me/cat_pics:/cats graphcore/tensorflow ls -a /catsanddog.jpg
+gc-docker -- -ti -e POPLAR_LOG_LEVEL=TRACE graphcore/tensorflow:2 python3
+
+
+//------------------------------------------
+//IPU-POD System에서 Docker 기동하는 명령어
+//------------------------------------------
+먼저 Linux User에게 IPU가 할당되어있어야 합니다.
+
+gc-docker -- --rm --shm-size=1g --ulimit stack=67108864 --ulimit memlock=-1 -v /etc/ipuof.conf.d/:/etc/ipuof.conf.d/ -v /home/mkbahk:/home/mkbahk --device=/dev/infiniband/ --device=/dev/infiniband/rdma_cm -ti {수행할 도커이미지 이름} /bin/bash
+
+
+
+//------------------------------------------
+//관리자가 docker 설치 및 일반사용자가 접근가능하도록 퍼미션 허가
+//------------------------------------------
+sudo apt install docker.io -y
+
+$ sudo groupadd docker
+Add your user to the docker group.
+
+$ sudo usermod -aG docker $USER
+Log out and log back in so that your group membership is re-evaluated.
+
+$ newgrp docker
+Verify that you can run docker commands without sudo.
+
+$ docker run hello-world
+
+또는
+
+sudo chmod 666 /var/run/docker.sock 
+
+
+//------------------------------------------
+// Superuser 계정으로 IPU-POD16,64 관리자 수행(할당)명령 
+//------------------------------------------
+sudo su - ipuuser
+vipu-admin create agent ag1 --host 10.1.2.1 --port 8080
+…
+vipu-admin create cluster cl-torus --topology torus --agents ag1,ag2,ag3,ag4,ag5,ag6,ag7,ag8,ag9,ag10,ag11,ag12,ag13,ag14,ag15,ag16
+vipu-admin create allocation mkalloc1 --agents ag1,ag2,ag3,ag4
+vipu-admin create user mkbahk --allocations mkalloc1
+cp mkbahk.vipu-cli.hcl  ~mkbahk/mkbahk.vipu-cli.hcl
+exit
+chown mkbahk:mkbahk ~mkbahk/mkbahk.vipu-cli.hcl
+
+//------------------------------------------
+// IPU-POD16,64 사용자 수준 사용명령
+//------------------------------------------
+vipu --config mkbahk.vipu-cli.hcl list allocation
+vipu --config mkbahk.vipu-cli.hcl create partition mkpt1 --size 16 –reconfigurable
+gc-monitor or gc-info -l
+
+

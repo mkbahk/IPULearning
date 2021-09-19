@@ -1,0 +1,21 @@
+--------------------------------------------------------------------------
+[[21000,1],0]: A high-performance Open MPI point-to-point messaging module
+was unable to find any relevant network interfaces:
+
+Module: OpenFabrics (openib)
+  Host: host201
+
+Another transport will be used instead, although this may result in
+lower performance.
+
+NOTE: You can disable this warning by setting the MCA parameter
+btl_base_warn_component_unused to 0.
+--------------------------------------------------------------------------
+Hello world from processor host201, rank 1 out of 8 processors
+Hello world from processor host201, rank 2 out of 8 processors
+Hello world from processor host201, rank 3 out of 8 processors
+Hello world from processor host201, rank 0 out of 8 processors
+Hello world from processor host202, rank 6 out of 8 processors
+Hello world from processor host202, rank 4 out of 8 processors
+Hello world from processor host202, rank 5 out of 8 processors
+Hello world from processor host202, rank 7 out of 8 processors

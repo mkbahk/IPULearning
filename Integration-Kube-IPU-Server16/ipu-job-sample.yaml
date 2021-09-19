@@ -1,0 +1,54 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-dl-mnist-ipu-00
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      nodeSelector:
+        kubernetes.io/hostname: srv16
+      containers:
+      - name: gc-ipu-p21-tf21-mnist-autorun-4k8s
+        image: mkbahk/gc-ipu-p21-tf21-mnist-autorun-4k8s:1.0
+        volumeMounts:
+        - mountPath: /dev/ipu0
+          name: dev-ipu0
+        volumeMounts:
+        - mountPath: /dev/ipu0_ex
+          name: dev-ipu0-ex
+        volumeMounts:
+        - mountPath: /dev/ipu0_mem
+          name: dev-ipu0-mem
+        volumeMounts:
+        - mountPath: /dev/ipu1
+          name: dev-ipu1
+        volumeMounts:
+        - mountPath: /dev/ipu1_ex
+          name: dev-ipu1-ex
+        volumeMounts:
+        - mountPath: /dev/ipu1_mem
+          name: dev-ipu1-mem
+        securityContext:
+          privileged: true
+      volumes:
+      - name: dev-ipu0
+        hostPath:
+          path: /dev/ipu0
+      - name: dev-ipu0-ex
+        hostPath:
+          path: /dev/ipu0_ex
+      - name: dev-ipu0-mem
+        hostPath:
+          path: /dev/ipu0_mem  
+      - name: dev-ipu1
+        hostPath:
+          path: /dev/ipu1
+      - name: dev-ipu1-ex
+        hostPath:
+          path: /dev/ipu1_ex
+      - name: dev-ipu1-mem
+        hostPath:
+          path: /dev/ipu1_mem                                    
+      terminationGracePeriodSeconds: 0

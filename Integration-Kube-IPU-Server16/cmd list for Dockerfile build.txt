@@ -1,0 +1,40 @@
+docker load -i poplar-docker-images-2.1.0-6bb5f5b742.tar.gz
+docker image ls | grep graphcore
+gc-docker -- -ti graphcore/tensorflow:2-intel-1.3.0-bionic-20200903 /bin/bash 
+apt update -y
+pip3 install -U pip
+
+apt install curl git wget htop nano
+
+gc-monitor
+
+root@418e4e4fe30a:~# python3
+Python 3.6.9 (default, Jan 26 2021, 15:33:00)
+[GCC 8.4.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import tensorflow as tf
+2021-07-14 05:00:01.040503: I tensorflow/compiler/plugin/poplar/driver/poplar_platform.cc:44] Poplar version: 2.1.0 (bb92605dfd) Poplar package: ce995e299d
+>>> print(tf.__version__)
+2.1.2
+>>> quit()
+
+cd /root
+git clone https://github.com/mkbahk/graphcore-ipu-demo
+
+python3 /root/graphcore-ipu-demo/mnist-cnn/mnist-cnn-keras-functional-ipu-dist.py
+
+docker container ls -a
+
+docker commit 418e4e4fe30a mkbahk/gc-ipu-p21-tf21-mnist
+
+docker push mkbahk/gc-ipu-p21-tf21-mnist
+
+Dockerfile
+FROM mkbahk/gc-ipu-p21-tf21-mnist:latest
+ENTRYPOINT ["python3", "/root/graphcore-ipu-demo/mnist-cnn/mnist-cnn-keras-functional-ipu-dist.py"]
+
+docker build --tag mkbahk/gc-ipu-p21-tf21-mnist-autorun-4k8s:1.0 .
+docker push mkbahk/gc-ipu-p21-tf21-mnist-autorun-4k8s:1.0
+
+gc-docker -- -it mkbahk/gc-ipu-p21-tf21-mnist-autorun-4k8s:1.0
+
