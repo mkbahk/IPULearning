@@ -1,5 +1,5 @@
 ## :purple_heart: graphcore-ipu-demo by Megazone Cloud Git소개
-:gb:영국 [Graphcore](http://graphcore.ai) :kr:한국내 총판인 [메가존클라우드](http://www.megazone.com) AI System Group에서 Graphcore IPU의 기본사용법과 CPU, GPU, TPU, IPU간의 코드비교, 분산전략등을 위한 데모코드 작성을 위해 운영하는 깃트입니다.
+:gb:영국 [Graphcore](http://graphcore.ai) :kr:한국내 총판인 [메가존클라우드](http://www.megazone.com) AI System Group/AI Solution Architect Team에서 Graphcore IPU의 기본사용법과 CPU, GPU, TPU, IPU간의 코드비교, 분산전략등을 위한 데모코드 작성을 위해 운영하는 깃트입니다.
 질문은 m k b a h k @ m e g a z o n e.c o m 으로 주세요.
 
 
