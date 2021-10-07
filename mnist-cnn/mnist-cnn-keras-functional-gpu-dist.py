@@ -52,20 +52,20 @@ def functional_model_fn():
 
 def train_model(model):
     # 훈련용 하이퍼파라메터
-    batch_size = 128
+    batch_size = 600
     epochs = 100
 
     # 데이타 얻기
     x_train, y_train, x_test, y_test = data_fn()
 
     # 훈련을 위해서 모델을 컴파일
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'], steps_per_execution=20)
 
     # 모델을 훈련하기
     model.fit(x=x_train, y=y_train, batch_size=batch_size, epochs=epochs)
 
     # 훈련된 모델을 평가하기
-    eval_out = model.evaluate(x=x_test, y=y_test, batch_size=batch_size)
+    eval_out = model.evaluate(x=x_test, y=y_test, batch_size=100)
     print("Evaluation Loss: %f Evaluation Accuracy: %f" % tuple(eval_out))
 ### end of def:
 
@@ -84,5 +84,3 @@ if __name__ == '__main__':
 """ 
 end of codes 
 """
-
-

@@ -71,14 +71,12 @@ def train_model(model):
 ### end of def:
 
 if __name__ == '__main__':
-
+    # IPU System 설정
     config = ipu.config.IPUConfig()
     config.auto_select_ipus = 4
     config.configure_ipu_system()
 
-
     strategy = ipu.ipu_strategy.IPUStrategy()
-
     with strategy.scope():
         # funcaitonal model 훈련하기
         print("\n\nTraining a Function MNIST Model.")
