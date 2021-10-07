@@ -53,17 +53,17 @@ def functional_model_fn():
 
 def train_model(model):
     # 훈련용 하이퍼파라메터
-    batch_size = 1000
+    batch_size = 600
     epochs = 100
 
     # 데이타 얻기
     x_train, y_train, x_test, y_test = data_fn()
 
     # 훈련을 위해서 모델을 컴파일
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'], steps_per_execution=2)
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'], steps_per_execution=20)
 
     # 모델을 훈련하기
-    model.fit(x=x_train, y=y_train, batch_size=batch_size, epochs=epochs)
+    model.fit(x=x_train, y=y_train, batch_size=batch_size, epochs=100)
 
     # 훈련된 모델을 평가하기
     eval_out = model.evaluate(x=x_test, y=y_test, batch_size=batch_size)
@@ -71,13 +71,9 @@ def train_model(model):
 ### end of def:
 
 if __name__ == '__main__':
-    # IPU System 설정
-    #cfg = ipu.utils.create_ipu_config()
-    #cfg = ipu.utils.auto_select_ipus(cfg, 2)
-    #ipu.utils.configure_ipu_system(cfg)
 
     config = ipu.config.IPUConfig()
-    config.auto_select_ipus = 2
+    config.auto_select_ipus = 4
     config.configure_ipu_system()
 
 
