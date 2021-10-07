@@ -63,10 +63,10 @@ def train_model(model):
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'], steps_per_execution=20)
 
     # 모델을 훈련하기
-    model.fit(x=x_train, y=y_train, batch_size=batch_size, epochs=100)
+    model.fit(x=x_train, y=y_train, batch_size=batch_size, epochs=epochs)
 
     # 훈련된 모델을 평가하기
-    eval_out = model.evaluate(x=x_test, y=y_test, batch_size=batch_size)
+    eval_out = model.evaluate(x=x_test, y=y_test, batch_size=100)
     print("Evaluation Loss: %f Evaluation Accuracy: %f" % tuple(eval_out))
 ### end of def:
 
