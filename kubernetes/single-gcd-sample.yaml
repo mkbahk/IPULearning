@@ -1,0 +1,43 @@
+---
+apiVersion: graphcore.ai/v1alpha1 # the API that defined this API object type
+kind: MPIJob # the kind of this Kubernetes object
+metadata:
+  name: mpijob-sample # the name of the job
+spec:
+  modelReplicas: "4" # how many replicas should the graph model be split into when being processed
+  ipusPerModelReplica: "1" # how many IPUs should be assigned to each model replica
+  launcher:
+    command: # the command to trigger the job execution
+      - mpirun 
+      - --allow-run-as-root
+      - --bind-to 
+      - none
+      - -np
+      - "1"
+      - python3 
+      - /public_examples/applications/tensorflow/cnns/training/train.py
+      - --dataset=cifar-10
+      - --synthetic-data 
+      - --model-size=8 
+      - --batch-size=1 
+      - --batches-per-step=10 
+      - --gradient-accumulation-count=10
+      - --no-validation 
+      - --no-stochastic-rounding
+      - --iterations=20
+  workers:
+    replicas: 1 # how many workers (poplar instances) should participate in this execution 
+    template: # native Kubernetes pod template. https://kubernetes.io/docs/concepts/workloads/pods/#pod-templates
+      metadata:
+        labels:
+          app: resnet-launcher 
+      spec:
+        containers: # the containers running inside each worker
+        - name: resnet
+          # TODO: replace this with a publicly accessible image
+          image: artifactory-systems.eng.graphcore.ai/vipu-k8s-docker-dev-local/resnet-poplar-2.0:latest
+          env: # environment variables set on each worker
+          - name: "IPUOF_LOG_LEVEL"
+            value: "INFO" 
+          - name: "POPLAR_LOG_LEVEL"
+            value: "INFO" 

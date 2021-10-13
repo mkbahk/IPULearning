@@ -1,0 +1,338 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-3
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: k8s-node1
+  containers:
+  - name: container
+    image: kubetm/init
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-5
+spec:
+  containers:
+  - name: container
+    image: kubetm/init
+    resources:
+      requests:
+        memory: 2Gi
+      limits:
+        memory: 3Gi
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gc-pod-1
+spec:
+  containers:
+  - name: gc-p20tf21-mnist-cpu-autorun
+    image: mkbahk/gc-p20tf21-mnist-cpu-autorun:1.0
+  terminationGracePeriodSeconds: 0
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-dl-mnist-cpu-16
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: gc-p20tf21-mnist-cpu-autorun-14
+        image: mkbahk/gc-p20tf21-mnist-cpu-autorun:1.0
+      terminationGracePeriodSeconds: 0
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-dl-mnist-ipu-00
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      nodeSelector:
+        kubernetes.io/hostname: host207-ipusrv16
+      containers:
+      - name: gc-p20tf21-mnist-ipu-autorun-00
+        image: mkbahk/gc-p20tf21-mnist-ipu-autorun:1.0
+        volumeMounts:
+        - mountPath: /dev/ipu0
+          name: dev-ipu0
+        volumeMounts:
+        - mountPath: /dev/ipu0_ex
+          name: dev-ipu0-ex
+        volumeMounts:
+        - mountPath: /dev/ipu0_mem
+          name: dev-ipu0-mem
+        volumeMounts:
+        - mountPath: /dev/ipu1
+          name: dev-ipu1
+        volumeMounts:
+        - mountPath: /dev/ipu1_ex
+          name: dev-ipu1-ex
+        volumeMounts:
+        - mountPath: /dev/ipu1_mem
+          name: dev-ipu1-mem
+        securityContext:
+          privileged: true
+      volumes:
+      - name: dev-ipu0
+        hostPath:
+          path: /dev/ipu0
+      - name: dev-ipu0-ex
+        hostPath:
+          path: /dev/ipu0_ex
+      - name: dev-ipu0-mem
+        hostPath:
+          path: /dev/ipu0_mem  
+      - name: dev-ipu1
+        hostPath:
+          path: /dev/ipu1
+      - name: dev-ipu1-ex
+        hostPath:
+          path: /dev/ipu1_ex
+      - name: dev-ipu1-mem
+        hostPath:
+          path: /dev/ipu1_mem                                    
+      terminationGracePeriodSeconds: 0
+
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-1
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: container
+        image: kubetm/init
+        command: ["sh", "-c", "echo 'job start';sleep 20; echo 'job end'"]
+      terminationGracePeriodSeconds: 0
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-2
+spec:
+  completions: 6
+  parallelism: 2
+  activeDeadlineSeconds: 30
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: container
+        image: kubetm/init
+        command: ["sh", "-c", "echo 'job start';sleep 20; echo 'job end'"]
+      terminationGracePeriodSeconds: 0
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-graphcore-ipu-demo
+spec:
+  capacity:
+    storage: 20G
+  accessModes:
+  - ReadWriteMany
+  local:
+    path: /graphcore-ipu-demo
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - {key: kubernetes.io/hostname, operator: In, values: [host207-ipusrv16]}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-graphcore-ipu-demo
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 20G
+  storageClassName: ""
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-ubuntu-tf22-apache2-01
+spec:
+  selector:
+    svc: ubuntu-tf22-apache2-01
+  ports:
+  - port: 80
+    targetPort: 8080
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-ubuntu-tf22-apache2-01
+  labels:
+    svc: ubuntu-tf22-apache2-01
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: host207-ipusrv16 
+  containers:
+  - name: container
+    image: mkbahk/ubuntu-apache2-tf22-cpu:1.0
+    volumeMounts:
+    - name: graphcore-ipu-demo
+      mountPath: /graphcore-ipu-demo
+  volumes:
+  - name : graphcore-ipu-demo
+    persistentVolumeClaim:
+      claimName: pvc-graphcore-ipu-demo 
+  terminationGracePeriodSecs: 0
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-gc-p20-tf21-node-p7777-01
+spec:
+  selector:
+    svc: lbl-gc-p20-tf21-node-p7777-01
+  ports:
+  - port: 7777
+    targetPort: 7777
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-gc-p20-tf21-node-p7777-01
+  labels:
+    svc: lsl-gc-p20-tf21-node-p7777-01
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: host207-ipusrv16 
+  containers:
+  - name: container
+    image: mkbahk/gc-p20-tf21-node-p7777:1.0
+    volumeMounts:
+    - mountPath: /graphcore-ipu-demo
+      name: graphcore-ipu-demo
+    - mountPath: /dev/ipu0
+      name: dev-ipu0
+    - mountPath: /dev/ipu0_ex
+      name: dev-ipu0-ex
+    - mountPath: /dev/ipu0_mem
+      name: dev-ipu0-mem
+    - mountPath: /dev/ipu1
+      name: dev-ipu1
+    - mountPath: /dev/ipu1_ex
+      name: dev-ipu1-ex
+    - mountPath: /dev/ipu1_mem
+      name: dev-ipu1-mem
+    securityContext:
+      privileged: true
+  volumes:
+  - name : graphcore-ipu-demo
+    persistentVolumeClaim:
+      claimName: pvc-graphcore-ipu-demo
+  - name: dev-ipu0
+    hostPath:
+      path: /dev/ipu0
+  - name: dev-ipu0-ex
+    hostPath:
+      path: /dev/ipu0_ex
+  - name: dev-ipu0-mem
+    hostPath:
+      path: /dev/ipu0_mem  
+  - name: dev-ipu1
+    hostPath:
+      path: /dev/ipu1
+  - name: dev-ipu1-ex
+    hostPath:
+      path: /dev/ipu1_ex
+  - name: dev-ipu1-mem
+    hostPath:
+      path: /dev/ipu1_mem   
+  terminationGracePeriodSecs: 0 
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-ubuntu-tf22-apache2-02
+spec:
+  selector:
+    svc: ubuntu-tf22-apache2-02
+  ports:
+  - port: 80
+    targetPort: 8080
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-ubuntu-tf22-apache2-022
+  labels:
+    svc: ubuntu-tf22-apache2-022
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: host207-ipusrv16 
+  containers:
+  - name: container
+    image: graphcore/tensorflow:2-intel-2.0.0-bionic-20200903
+    command: ["sh", "-c", "while true; do sleep 1; done"]
+    volumeMounts:
+    - mountPath: /graphcore-ipu-demo
+      name: graphcore-ipu-demo
+    - mountPath: /dev/ipu0
+      name: dev-ipu0
+    - mountPath: /dev/ipu0_ex
+      name: dev-ipu0-ex
+    - mountPath: /dev/ipu0_mem
+      name: dev-ipu0-mem
+    - mountPath: /dev/ipu1
+      name: dev-ipu1
+    - mountPath: /dev/ipu1_ex
+      name: dev-ipu1-ex
+    - mountPath: /dev/ipu1_mem
+      name: dev-ipu1-mem
+    securityContext:
+      privileged: true
+  volumes:
+  - name : graphcore-ipu-demo
+    persistentVolumeClaim:
+      claimName: pvc-graphcore-ipu-demo
+  - name: dev-ipu0
+    hostPath:
+      path: /dev/ipu0
+  - name: dev-ipu0-ex
+    hostPath:
+      path: /dev/ipu0_ex
+  - name: dev-ipu0-mem
+    hostPath:
+      path: /dev/ipu0_mem  
+  - name: dev-ipu1
+    hostPath:
+      path: /dev/ipu1
+  - name: dev-ipu1-ex
+    hostPath:
+      path: /dev/ipu1_ex
+  - name: dev-ipu1-mem
+    hostPath:
+      path: /dev/ipu1_mem   
+  terminationGracePeriodSecs: 0 

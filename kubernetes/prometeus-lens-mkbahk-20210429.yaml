@@ -1,0 +1,298 @@
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: prometheus
+  namespace: lens-metrics
+  uid: e828053e-6352-4142-b841-52317ce3eba8
+  resourceVersion: '304576'
+  generation: 1
+  creationTimestamp: '2021-04-29T01:16:34Z'
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: >
+      {"apiVersion":"apps/v1","kind":"StatefulSet","metadata":{"annotations":{},"name":"prometheus","namespace":"lens-metrics"},"spec":{"replicas":1,"selector":{"matchLabels":{"name":"prometheus"}},"serviceName":"prometheus","template":{"metadata":{"labels":{"name":"prometheus"}},"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.io/os","operator":"In","values":["linux"]}]},{"matchExpressions":[{"key":"beta.kubernetes.io/os","operator":"In","values":["linux"]}]}]}}},"containers":[{"args":["--web.listen-address=0.0.0.0:9090","--config.file=/etc/prometheus/prometheus.yaml","--storage.tsdb.path=/var/lib/prometheus","--storage.tsdb.retention.time=2d","--storage.tsdb.retention.size=5GB","--storage.tsdb.min-block-duration=2h","--storage.tsdb.max-block-duration=2h"],"image":"quay.io/prometheus/prometheus:v2.19.3","livenessProbe":{"httpGet":{"path":"/-/healthy","port":9090},"initialDelaySeconds":10,"timeoutSeconds":10},"name":"prometheus","ports":[{"containerPort":9090,"name":"web"}],"readinessProbe":{"httpGet":{"path":"/-/ready","port":9090},"initialDelaySeconds":10,"timeoutSeconds":10},"resources":{"requests":{"cpu":"100m","memory":"512Mi"}},"volumeMounts":[{"mountPath":"/etc/prometheus","name":"config"},{"mountPath":"/etc/prometheus/rules","name":"rules"},{"mountPath":"/var/lib/prometheus","name":"data"}]}],"initContainers":[{"command":["chown","-R","65534:65534","/var/lib/prometheus"],"image":"docker.io/alpine:3.9","name":"chown","volumeMounts":[{"mountPath":"/var/lib/prometheus","name":"data"}]}],"serviceAccountName":"prometheus","terminationGracePeriodSeconds":30,"volumes":[{"configMap":{"name":"prometheus-config"},"name":"config"},{"configMap":{"name":"prometheus-rules"},"name":"rules"}]}},"volumeClaimTemplates":[{"metadata":{"name":"data"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}}}}]}}
+  managedFields:
+    - manager: kube-controller-manager
+      operation: Update
+      apiVersion: apps/v1
+      time: '2021-04-29T01:16:34Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:status':
+          'f:collisionCount': {}
+          'f:currentReplicas': {}
+          'f:currentRevision': {}
+          'f:observedGeneration': {}
+          'f:replicas': {}
+          'f:updateRevision': {}
+          'f:updatedReplicas': {}
+    - manager: kubectl-client-side-apply
+      operation: Update
+      apiVersion: apps/v1
+      time: '2021-04-29T01:16:34Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            .: {}
+            'f:kubectl.kubernetes.io/last-applied-configuration': {}
+        'f:spec':
+          'f:podManagementPolicy': {}
+          'f:replicas': {}
+          'f:revisionHistoryLimit': {}
+          'f:selector': {}
+          'f:serviceName': {}
+          'f:template':
+            'f:metadata':
+              'f:labels':
+                .: {}
+                'f:name': {}
+            'f:spec':
+              'f:affinity':
+                .: {}
+                'f:nodeAffinity':
+                  .: {}
+                  'f:requiredDuringSchedulingIgnoredDuringExecution':
+                    .: {}
+                    'f:nodeSelectorTerms': {}
+              'f:containers':
+                'k:{"name":"prometheus"}':
+                  .: {}
+                  'f:args': {}
+                  'f:image': {}
+                  'f:imagePullPolicy': {}
+                  'f:livenessProbe':
+                    .: {}
+                    'f:failureThreshold': {}
+                    'f:httpGet':
+                      .: {}
+                      'f:path': {}
+                      'f:port': {}
+                      'f:scheme': {}
+                    'f:initialDelaySeconds': {}
+                    'f:periodSeconds': {}
+                    'f:successThreshold': {}
+                    'f:timeoutSeconds': {}
+                  'f:name': {}
+                  'f:ports':
+                    .: {}
+                    'k:{"containerPort":9090,"protocol":"TCP"}':
+                      .: {}
+                      'f:containerPort': {}
+                      'f:name': {}
+                      'f:protocol': {}
+                  'f:readinessProbe':
+                    .: {}
+                    'f:failureThreshold': {}
+                    'f:httpGet':
+                      .: {}
+                      'f:path': {}
+                      'f:port': {}
+                      'f:scheme': {}
+                    'f:initialDelaySeconds': {}
+                    'f:periodSeconds': {}
+                    'f:successThreshold': {}
+                    'f:timeoutSeconds': {}
+                  'f:resources':
+                    .: {}
+                    'f:requests':
+                      .: {}
+                      'f:cpu': {}
+                      'f:memory': {}
+                  'f:terminationMessagePath': {}
+                  'f:terminationMessagePolicy': {}
+                  'f:volumeMounts':
+                    .: {}
+                    'k:{"mountPath":"/etc/prometheus"}':
+                      .: {}
+                      'f:mountPath': {}
+                      'f:name': {}
+                    'k:{"mountPath":"/etc/prometheus/rules"}':
+                      .: {}
+                      'f:mountPath': {}
+                      'f:name': {}
+                    'k:{"mountPath":"/var/lib/prometheus"}':
+                      .: {}
+                      'f:mountPath': {}
+                      'f:name': {}
+              'f:dnsPolicy': {}
+              'f:initContainers':
+                .: {}
+                'k:{"name":"chown"}':
+                  .: {}
+                  'f:command': {}
+                  'f:image': {}
+                  'f:imagePullPolicy': {}
+                  'f:name': {}
+                  'f:resources': {}
+                  'f:terminationMessagePath': {}
+                  'f:terminationMessagePolicy': {}
+                  'f:volumeMounts':
+                    .: {}
+                    'k:{"mountPath":"/var/lib/prometheus"}':
+                      .: {}
+                      'f:mountPath': {}
+                      'f:name': {}
+              'f:restartPolicy': {}
+              'f:schedulerName': {}
+              'f:securityContext': {}
+              'f:serviceAccount': {}
+              'f:serviceAccountName': {}
+              'f:terminationGracePeriodSeconds': {}
+              'f:volumes':
+                .: {}
+                'k:{"name":"config"}':
+                  .: {}
+                  'f:configMap':
+                    .: {}
+                    'f:defaultMode': {}
+                    'f:name': {}
+                  'f:name': {}
+                'k:{"name":"rules"}':
+                  .: {}
+                  'f:configMap':
+                    .: {}
+                    'f:defaultMode': {}
+                    'f:name': {}
+                  'f:name': {}
+          'f:updateStrategy':
+            'f:rollingUpdate':
+              .: {}
+              'f:partition': {}
+            'f:type': {}
+          'f:volumeClaimTemplates': {}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: prometheus
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: prometheus
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: prometheus-config
+            defaultMode: 420
+        - name: rules
+          configMap:
+            name: prometheus-rules
+            defaultMode: 420
+      initContainers:
+        - name: chown
+          image: 'docker.io/alpine:3.9'
+          command:
+            - chown
+            - '-R'
+            - '65534:65534'
+            - /var/lib/prometheus
+          resources: {}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/prometheus
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+      containers:
+        - name: prometheus
+          image: 'quay.io/prometheus/prometheus:v2.19.3'
+          args:
+            - '--web.listen-address=0.0.0.0:9090'
+            - '--config.file=/etc/prometheus/prometheus.yaml'
+            - '--storage.tsdb.path=/var/lib/prometheus'
+            - '--storage.tsdb.retention.time=2d'
+            - '--storage.tsdb.retention.size=5GB'
+            - '--storage.tsdb.min-block-duration=2h'
+            - '--storage.tsdb.max-block-duration=2h'
+          ports:
+            - name: web
+              containerPort: 9090
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prometheus
+            - name: rules
+              mountPath: /etc/prometheus/rules
+            - name: data
+              mountPath: /var/lib/prometheus
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: 9090
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: 9090
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      serviceAccountName: prometheus
+      serviceAccount: prometheus
+      securityContext: {}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/os
+                    operator: In
+                    values:
+                      - linux
+              - matchExpressions:
+                  - key: beta.kubernetes.io/os
+                    operator: In
+                    values:
+                      - linux
+      schedulerName: default-scheduler
+  volumeClaimTemplates:
+    - kind: PersistentVolumeClaim
+      apiVersion: v1
+      metadata:
+        name: data
+        creationTimestamp: null
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 20Gi
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+  serviceName: prometheus
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  revisionHistoryLimit: 10
+status:
+  observedGeneration: 1
+  replicas: 1
+  currentReplicas: 1
+  updatedReplicas: 1
+  currentRevision: prometheus-6c7c7f7c96
+  updateRevision: prometheus-6c7c7f7c96
+  collisionCount: 0
+
