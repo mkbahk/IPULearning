@@ -53,7 +53,7 @@ def sequential_model_fn():
             layers.Dense(num_classes, activation='softmax')
         ]
     ]
-    return ipu.keras.SequentialPipelineModel(stages, gradient_accumulation_count=8)
+    return keras.SequentialPipelineModel(stages, gradient_accumulation_count=8)
 ### end of def:
 
 def functional_model_fn():
@@ -76,7 +76,7 @@ def functional_model_fn():
         output_layer = layers.Dense(num_classes, activation='softmax')(x)
     ### end of with:
 
-    return ipu.keras.PipelineModel(input_layer, output_layer, gradient_accumulation_count=8)
+    return keras.PipelineModel(input_layer, output_layer, gradient_accumulation_count=8)
 ### end of def:
 
 def train_model(model):
