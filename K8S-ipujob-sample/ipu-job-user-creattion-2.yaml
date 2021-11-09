@@ -1,0 +1,109 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ns-kbbahk
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sa-kbbahk
+  namespace: ns-kbbahk
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cr-kbbahk
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: crb-kbbahk
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cr-kbbahk
+subjects:
+- kind: ServiceAccount
+  name: sa-kbbahk
+  namespace: ns-kbbahk
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ro-kbbahk
+  namespace: ns-kbbahk
+rules:
+- apiGroups: ["*"]
+  verbs: ["*"]
+  resources: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rb-kbbahk
+  namespace: ns-kbbahk
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name:  ro-kbbahk
+subjects:
+- kind: ServiceAccount
+  name: sa-kbbahk
+  namespace: ns-kbbahk
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: default
+  namespace: ns-kbbahk
+spec:
+  storageClassName: default
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-ubuntu-kbbahk-1
+  namespace: ns-kbbahk
+  labels:
+     app: pod-ubuntu-kbbahk
+spec:
+  containers:
+  - name: container
+    image: ubuntu:bionic
+    command:
+      - "/bin/sh"
+    args:
+      - "-c"
+      - "while true; do sleep 100; done"
+    volumeMounts:
+      - name: nfs-pvc
+        mountPath: "/mnt/nfs"
+  restartPolicy: "Never"
+  volumes:
+    - name: nfs-pvc
+      persistentVolumeClaim:
+        claimName: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-kbbahk
+  namespace: ns-kbbahk
+spec:
+  selector:
+    app: pod-ubuntu-kbbahk
+  ports:
+  - port: 8090
+    targetPort: 8090
+---
+ 

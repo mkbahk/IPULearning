@@ -1,0 +1,37 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  creationTimestamp: null
+  name: test-batch-job-00
+spec:
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      containers:
+      - command:
+        - date
+        image: busybox
+        name: test-batch-job-00
+        resources:
+          requests:
+            memory: 200Mi
+      restartPolicy: Never
+status: {}
+---
+
+# kubectl describe node | grep -i mem -C 5
+
+#root@pod642:~# kubectl get job
+#NAME       COMPLETIONS   DURATION   AGE
+#test-job   1/1           6s         2m29s
+
+#root@pod642:~# kubectl get job -o wide
+#NAME       COMPLETIONS   DURATION   AGE     CONTAINERS   IMAGES    SELECTOR
+#test-job   1/1           6s         2m36s   test-job     busybox   controller-uid=c1e0e52e-cd2a-4a79-8dbd-3241045e765a
+
+#root@pod642:~# 
+#root@pod642:~# kubectl delete job --all
+#job.batch "test-job" deleted
+#root@pod642:~#

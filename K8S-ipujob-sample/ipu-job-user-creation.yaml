@@ -1,0 +1,109 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ns-mkbahk
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sa-mkbahk
+  namespace: ns-mkbahk
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cr-mkbahk
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: crb-mkbahk
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cr-mkbahk
+subjects:
+- kind: ServiceAccount
+  name: sa-mkbahk
+  namespace: ns-mkbahk
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ro-mkbahk
+  namespace: ns-mkbahk
+rules:
+- apiGroups: ["*"]
+  verbs: ["*"]
+  resources: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rb-mkbahk
+  namespace: ns-mkbahk
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name:  ro-mkbahk
+subjects:
+- kind: ServiceAccount
+  name: sa-mkbahk
+  namespace: ns-mkbahk
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: default
+  namespace: ns-mkbahk
+spec:
+  storageClassName: default
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-ubuntu-mkbahk-1
+  namespace: ns-mkbahk
+  labels:
+     app: pod-ubuntu-mkbahk
+spec:
+  containers:
+  - name: container
+    image: ubuntu:bionic
+    command:
+      - "/bin/sh"
+    args:
+      - "-c"
+      - "while true; do sleep 100; done"
+    volumeMounts:
+      - name: nfs-pvc
+        mountPath: "/mnt/nfs"
+  restartPolicy: "Never"
+  volumes:
+    - name: nfs-pvc
+      persistentVolumeClaim:
+        claimName: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-mkbahk
+  namespace: ns-mkbahk
+spec:
+  selector:
+    app: pod-ubuntu-mkbahk
+  ports:
+  - port: 8090
+    targetPort: 8090
+---
+ 

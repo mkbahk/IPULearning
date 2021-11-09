@@ -1,0 +1,35 @@
+---
+apiVersion: graphcore.ai/v1alpha1 # the API that defined this API object type
+kind: IPUJob # the kind of this Kubernetes object
+metadata:
+  name: ipujob-batch-mnist-00 # the name of the job
+spec:
+#  modelReplicas: "4" # how many replicas should the graph model be split into when being processed
+#  ipusPerModelReplica: "1" # how many IPUs should be assigned to each model replica
+  jobInstances: 1
+  ipusPerJobInstance: "1"
+  #workersPerJobInstance: ""
+  #modelReplicasPerWorker: ""
+  #restartPolicy: OnFailure #Restart policy for the job. One of: Always, OnFailure, Never and ExitCode. Defaults to Never.
+  cleanPodPolicy: "All" #Clean pod policy for the job after it is finished. One of: None, All, Workers Defaults to None.
+  launcher:
+    command: # the command to trigger the job execution
+      - python3 
+      - /GraphcoreLearning/mnist-cnn/mnist-cnn-keras-functional-ipu-dist-sdk-2.2-k8s-integration.py
+  workers:
+    replicas: 1 # how many workers (poplar instances) should participate in this execution 
+    template: # native Kubernetes pod template. https://kubernetes.io/docs/concepts/workloads/pods/#pod-templates
+      metadata:
+        labels:
+          app: ipujob-batch-mnist-worker-00
+      spec:
+        containers: # the containers running inside each worker
+        - name: ipujob-batch-mnist-container-00
+          # TODO: replace this with a publicly accessible image
+          image: docker.io/mkbahk/gc-amd-p22-tf24-k8s-integration:1.2
+          env: # environment variables set on each worker
+          - name: "IPUOF_LOG_LEVEL"
+            value: "INFO" 
+          - name: "POPLAR_LOG_LEVEL"
+            value: "INFO"
+---

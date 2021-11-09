@@ -1,0 +1,36 @@
+---
+apiVersion: graphcore.ai/v1alpha1
+kind: IPUJob
+metadata:
+  name: ipujob-interactive-mnist-02
+spec:
+  #modelReplicas: "4"
+  #ipusPerModelReplica: "1"
+  jobInstances: 1
+  ipusPerJobInstance: "1"
+  #workersPerJobInstance: ""
+  #modelReplicasPerWorker: ""
+  #restartPolicy: OnFailure #Restart policy for the job. One of: Always, OnFailure, Never and ExitCode. Defaults to Never.
+  cleanPodPolicy: "Workers" #Clean pod policy for the job after it is finished. One of: None, All, Workers Defaults to None.
+  interactive:
+    ttl: 36000 # how long should the interactive session last, TTL specifies how long this ipujob should live
+  workers:
+    replicas: 1 #Replicas is the desired number of replicas of the given template.
+    template:  #Template is the object that describes the pod that will be created for this replica. RestartPolicy in PodTemplateSpec will be overide by RestartPolicy in ReplicaSpec
+      metadata:
+        labels:
+          app: ipujob-interactive-mnist-worker-02
+      spec:
+        containers: 
+        - name: ipujob-interactive-mnist-container-02
+          # TODO: replace this with a publicly accessible image
+          image: docker.io/mkbahk/gc-amd-p22-tf24-k8s-integration:1.3
+          imagePullPolicy: IfNotPresent
+          command: [ "/bin/bash", "-c", "--" ]
+          args: [ "while true; do sleep 30; done;" ]
+          env: 
+          - name: "IPUOF_LOG_LEVEL"
+            value: "INFO" 
+          - name: "POPLAR_LOG_LEVEL"
+            value: "INFO"
+---
