@@ -12,5 +12,7 @@
 차량속도(carSpd)=2
 운전대각도(steeAng)=0
 
+사고여부(AcciPos=0 // Y값, 사고가 났어는지 여부로 학습시 사용하고, 아래 URL에는 입력하지 않음 
+
 REST API 서비스 URL:
 http://srv161:9001/smartcar/predict?wea=2&temp=0&hum=1&arrOthCar=2&time=0%acciArea=1&drvCond=1&innCond=2&carSpd=2&SteeAng=0
