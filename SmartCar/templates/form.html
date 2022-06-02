@@ -1,0 +1,86 @@
+<html>
+    <body>
+        <div class="bodyStyle">
+            <h1>SmartCar 예측 프로그램</h1>
+            <form action = "http://218.145.56.73:9001/smartcar/predict/result" method = "POST">
+              <label for="wea">날씨</label>
+              <select id="wea" name="wea">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+              </select>
+              <label for="temp">온도</label>
+              <select id="temp" name="temp">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+              </select>
+              <label for="hum">습도</label>
+              <select id="hum" name="hum">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+              </select>
+              <label for="arrOthCar">차량방향</label>
+              <select id="arrOthCar" name="arrOthCar">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+              </select>
+              <label for="time">시간</label>
+              <select id="time" name="time">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+              </select>
+              <label for="acciArea">사고지역</label>
+              <select id="acciArea" name="acciArea">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+              </select>
+              <label for="drvCond">운전자상태</label>
+              <select id="drvCond" name="drvCond">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+              </select>
+              <label for="innCond">내부상태</label>
+              <select id="innCond" name="innCond">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+              </select>
+              <label for="carSpd">차량속도</label>
+              <select id="carSpd" name="carSpd">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+              </select>
+              <label for="SteeAng">핸들방향</label>
+              <select id="SteeAng" name="SteeAng">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+              </select>
+              <br><br>
+              <input class="button" type="submit" value="추론(Inference)"/>
+            </form>
+          </div>
+    </body>
+</html>
+
+
+<style>
+    .bodyStyle{
+      padding: 20px;
+    }
+    select {
+         width:35px;
+         margin-right: 10px;
+    }
+    .button{
+        width: 120px;
+        height: 30px;
+    }
+</style>

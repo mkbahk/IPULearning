@@ -1,4 +1,7 @@
-###그림 8.21 라이브러리 임포트 및 학습 데이터 로드##################################################################
+###
+# Tensorflow 2.6에서 Compile 되었습니다.
+#
+###라이브러리 임포트 및 학습 데이터 로드##################################################################
 
 import tensorflow as tf
 import pandas as pd
@@ -17,7 +20,7 @@ from tensorflow.keras.utils import to_categorical
 
 df = pd.read_csv('/home/mkbahk/SmartCar/CarDrivingIncidentInfo.csv')
 
-###그림 8.22 학습 데이터 전처리##################################################################
+###학습 데이터 전처리##################################################################
 
 X = df.iloc[:, :-1].values
 Y = df.iloc[:, -1].values
@@ -31,7 +34,7 @@ sc = StandardScaler()
 X_train = sc.fit_transform(X_train)
 X_test = sc.transform(X_test)
 
-###그림 8.23 DNN 모델 구성 및 요약 정보 출력##################################################################
+###DNN 모델 구성 및 요약 정보 출력##################################################################
 
 model = Sequential([
     Dense(10, input_dim=10, activation='relu'),
@@ -43,19 +46,19 @@ model = Sequential([
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 model.summary()
 
-###그림 8.25 DNN 모델 학습##################################################################
+###DNN 모델 학습##################################################################
 
 tensorboard = keras.callbacks.TensorBoard(log_dir='./graph', histogram_freq=1, write_graph=True, write_images=True)
 
 hist  = model.fit(X_train, Y_train, batch_size=2000, epochs=50, callbacks=[tensorboard], validation_data=(X_test, Y_test))
 
-###그림 8.26 DNN 모델을 학습한 결과##################################################################
+###DNN 모델을 학습한 결과##################################################################
 
 score = model.evaluate(X_test, Y_test, verbose=0)
 print(model.metrics_names)
 print(score)
 
-###그림 8.27 DNN 모델의 학습 결과 시각화##################################################################
+###DNN 모델의 학습 결과 시각화##################################################################
 
 fig, loss_ax = plt.subplots()
 acc_ax = loss_ax.twinx()
@@ -75,7 +78,7 @@ acc_ax.legend(loc='upper right')
 
 plt.show()
 
-###그림 8.28 DNN 모델 예측 결과 평가 – ROC 커브##################################################################
+###DNN 모델 예측 결과 평가 – ROC 커브##################################################################
 
 y_predict_result = model.predict(X_test)
 
@@ -96,7 +99,7 @@ plt.legend(loc="lower right")
 plt.grid(True)
 plt.show()
 
-###그림 8.29 DNN 모델 저장##################################################################
+###DNN 모델 저장##################################################################
 
 from keras.models import load_model
 
