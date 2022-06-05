@@ -103,5 +103,5 @@ plt.show()
 
 from keras.models import load_model
 
-prinf("Saving Model..... smartcar_dnn_model.h5")
+print("Saving Model..... smartcar_dnn_model.h5")
 model.save('./smartcar_dnn_model.h5')
