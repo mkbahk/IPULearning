@@ -18,7 +18,7 @@ from sklearn.metrics import roc_curve, roc_auc_score, auc
 from tensorflow.keras.utils import to_categorical
 
 
-df = pd.read_csv('./CarDrivingIncidentInfo.csv')
+df = pd.read_csv('/root/IPULearning/SmartCar/CarDrivingIncidentInfo.csv')
 
 ###학습 데이터 전처리##################################################################
 
@@ -104,4 +104,4 @@ plt.show()
 from keras.models import load_model
 
 print("Saving Model..... smartcar_dnn_model.h5")
-model.save('./smartcar_dnn_model.h5')
+model.save('/root/IPULearning/SmartCar/smartcar_dnn_model.h5')
