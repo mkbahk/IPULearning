@@ -7,8 +7,27 @@ source ./venvSmartCar/bin/activate
 
 //python3관련 패키지 설치
 pip3 install -U pip
-pip3 install tensorflow keras pandas matplotlib sklearn flask 
+pip3 install tensorflow keras pandas matplotlib sklearn flask jupyterlab
 
+===================================================
+Jupyter Lab 에서 실습
+===================================================
+
+jupyter lab --ip=0.0.0.0 --port=999X --allow-root
+
+nano smartcar_dnn_model.ipynb  //열어서 아래 코드 부분을 여러분의 절대경로로 바꾸어 주세요. 
+
+    df = pd.read_csv('/home/kbbahk/IPULearning/SmartCar/CarDrivingIncidentInfo.csv')
+    model.save('/home/kbbahk/IPULearning/SmartCar/smartcar_dnn_model.h5')
+
+
+//추론 서빙 수행
+!python3 smartcar_dnn_service.py
+
+
+===================================================
+Terminal에서 실습
+===================================================
 pwd //절대 경로 확인
 
 nano smartcar_dnn_model.py  //열어서 아래 코드 부분을 여러분의 절대경로로 바꾸어 주세요. 
@@ -19,16 +38,25 @@ nano smartcar_dnn_model.py  //열어서 아래 코드 부분을 여러분의 절
 //학습(Traning)
 python3 smartcar_dnn_model.py  //명령으로 학습시킵니다. 
 
+===================================================
+추론 실습
+===================================================
+
 nano smartcar_dnn_service.py //열어서 아래 부분 절대경로로 바꾸어 주세요.
     model = load_model('/home/kbbahk/IPULearning/SmartCar/smartcar_dnn_model.h5')
 
 //아래 코드의 port번호를 다른 사람들과 충돌생기지 않토록 900x 의 다른 번호 예) 9003  9004 로 바꾸어 주세요.
     app.run(host='0.0.0.0', port=9002)
 
-python3 smartcar_dnn_service_2.py  //Tensorflow와 Flask를 통해 TF.serving에 들어갑니다.
+python3 smartcar_dnn_service.py  //Tensorflow와 Flask를 통해 TF.serving에 들어갑니다.
 
    WARNING: This is a development server. Do not use it in a production deployment.
  * Running on http://218.145.56.73:9002/ (Press CTRL+C to quit)
+
+
+===================================================
+외부 브라우저에서 수행
+===================================================
 
  //Browser를 여시고, 변경시킨 포트번호 확인 후 
 http://218.145.56.73:9002/smartcar/predict  //옵션들을 입력하고 추론(Inference)
