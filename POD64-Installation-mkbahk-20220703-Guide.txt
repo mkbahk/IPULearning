@@ -1,0 +1,170 @@
+
+
+//------------------------------------------
+// Superuser 계정으로 IPU-POD16,64 관리자 수행(할당)명령 
+//------------------------------------------
+sudo su - ipuuser
+vipu-admin create agent ag1 --host 10.1.2.1 --port 8080
+…
+vipu-admin create cluster cl-torus --topology torus --agents ag1,ag2,ag3,ag4,ag5,ag6,ag7,ag8,ag9,ag10,ag11,ag12,ag13,ag14,ag15,ag16
+
+vipu-admin create allocation mkalloc1 --agents ag1,ag2,ag3,ag4
+
+vipu-admin create user mkbahk --allocations mkalloc1
+
+cp mkbahk.vipu-cli.hcl  ~mkbahk/mkbahk.vipu-cli.hcl
+exit
+chown mkbahk:mkbahk ~mkbahk/mkbahk.vipu-cli.hcl
+
+//------------------------------------------
+// IPU-POD16,64 사용자 수준 사용명령
+//------------------------------------------
+vipu --config mkbahk.vipu-cli.hcl list allocation
+vipu --config mkbahk.vipu-cli.hcl create partition mkpt1 --size 16 –reconfigurable
+gc-monitor or gc-info -l
+
+
+
+root@pod641:~# vipu-admin list partition
+ Cluster                | Allocation               | Partition           | ILDs | GW Routing | ILD Routing | Size | GCDs | State
+----------------------------------------------------------------------------------------------------------------------------------
+ KTHyperScaleAI_Cluster | KTHyperScaleAI_POD641    | pt-hakim-8-ipus     | 1    | DEFAULT    | DNC         | 8    | 1    | ACTIVE
+ KTHyperScaleAI_Cluster | KTHyperScaleAI_POD641    | pt-quantumai-8-ipus | 1    | DEFAULT    | DNC         | 4    | 1    | ACTIVE
+ KTHyperScaleAI_Cluster | KTHyperScaleAI_POD641    | pt-tak-8-ipus       | 1    | DEFAULT    | DNC         | 8    | 1    | ACTIVE
+ KTHyperScaleAI_Cluster | KTHyperScaleAI_POD641    | pt-khu1-8-ipus      | 1    | DEFAULT    | DNC         | 8    | 1    | ACTIVE
+ KTHyperScaleAI_Cluster | KTHyperScaleAI_POD642-32 | pt-jiwoongc-16-ipus | 1    | DEFAULT    | DNC         | 16   | 1    | ACTIVE //POD642
+ KTHyperScaleAI_Cluster | KTHyperScaleAI_POD642-32 | pt-minkyuk-16-ipus  | 1    | DEFAULT    | DNC         | 16   | 1    | ACTIVE //POD642
+ KTHyperScaleAI_Cluster | KTHyperScaleAI_POD641    | pt-quantec1-8-ipus  | 1    | DEFAULT    | DNC         | 8    | 1    | ACTIVE //POD642
+
+----------------------------------------------------------------------------------------------------------------------------------
+root@pod641:~#
+
+root@pod641:~# vipu-admin list agents
+ Agent       | Host      | Port | Status | Agent Version | IPUs | Last Error | System uptime   | Agent uptime
+-----------------------------------------------------------------------------------------------------------------
+ ipum1       | 10.1.2.1  | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 35m 38s | 87d 18h 34m 25s
+ ipum10      | 10.1.2.10 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 35m 13s | 87d 18h 34m 0s
+ ipum11      | 10.1.2.11 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 35m 26s | 87d 18h 34m 14s
+ ipum12      | 10.1.2.12 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 35m 34s | 87d 18h 34m 22s
+ ipum13      | 10.1.2.13 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 37m 7s  | 87d 18h 35m 55s
+ ipum14      | 10.1.2.14 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 34m 53s | 87d 18h 33m 41s
+ ipum15      | 10.1.2.15 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 36m 36s | 87d 18h 35m 24s
+ ipum16      | 10.1.2.16 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 34m 19s | 87d 18h 33m 7s
+ ipum17      | 10.1.2.17 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 34m 16s | 87d 18h 33m 3s
+ ipum18      | 10.1.2.18 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 35m 5s  | 87d 18h 33m 52s
+ ipum19      | 10.1.2.19 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 35m 35s | 87d 18h 34m 22s
+ ipum2       | 10.1.2.2  | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 35m 37s | 87d 18h 34m 24s
+ ipum20      | 10.1.2.20 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 34m 56s | 87d 18h 33m 44s
+ ipum21      | 10.1.2.21 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 36m 6s  | 87d 18h 34m 54s
+ ipum22      | 10.1.2.22 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 35m 41s | 87d 18h 34m 29s
+ ipum23      | 10.1.2.23 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 34m 44s | 87d 18h 33m 32s
+ ipum24      | 10.1.2.24 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 35m 17s | 87d 18h 34m 5s
+ ipum25      | 10.1.2.25 | 8080 | Up     | 1.16.1        | 4/4  |            | 80d 20h 54m 3s  | 80d 20h 48m 56s
+ ipum26      | 10.1.2.26 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 35m 32s | 87d 18h 34m 16s
+ ipum27      | 10.1.2.27 | 8080 | Up     | 1.16.1        | 4/4  |            | 80d 20h 54m 36s | 80d 20h 49m 36s
+ ipum28      | 10.1.2.28 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 34m 14s | 87d 18h 33m 2s
+ ipum29      | 10.1.2.29 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 35m 27s | 87d 18h 34m 14s
+ ipum3       | 10.1.2.3  | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 36m 2s  | 87d 18h 34m 49s
+ ipum30      | 10.1.2.30 | 8080 | Up     | 1.16.1        | 4/4  |            | 80d 20h 25m 43s | 80d 20h 20m 37s
+ ipum31      | 10.1.2.31 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 36m 15s | 87d 18h 35m 3s
+ ipum32      | 10.1.2.32 | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 36m 42s | 87d 18h 35m 29s
+ ipum4       | 10.1.2.4  | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 35m 46s | 87d 18h 34m 34s
+ ipum5       | 10.1.2.5  | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 35m 45s | 87d 18h 34m 32s
+ ipum6       | 10.1.2.6  | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 35m 45s | 87d 18h 34m 32s
+ ipum7       | 10.1.2.7  | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 34m 47s | 87d 18h 33m 34s
+ ipum8       | 10.1.2.8  | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 35m 19s | 87d 18h 34m 7s
+ ipum9       | 10.1.2.9  | 8080 | Up     | 1.16.1        | 4/4  |            | 87d 18h 35m 50s | 87d 18h 34m 37s
+
+
+ipuuser@pod641:~$ vipu-admin create cluster KTHSAIPOD641-Cluster --topology torus --cluster-topology looped --agents ipum1,ipum2,ipum3,ipum4,ipum5,ipum6,ipum7,ipum8,ipum9,ipum10,ipum11,ipum12,ipum13,ipum14,ipum15,ipum16
+create cluster (KTHSAIPOD641-Cluster): success.
+create allocation (KTHSAIPOD641-Cluster): success.
+
+ipuuser@pod641:~$ vipu-admin create cluster KTHSAIPOD642-Cluster --topology torus --cluster-topology looped --agents ipum17,ipum18,ipum19,ipum20,ipum21,ipum22,ipum23,ipum24,ipum25,ipum26,ipum27,ipum28,ipum29,ipum30,ipum31,ipum32
+create cluster (KTHyperScaleAIPOD642): success.
+create allocation (KTHyperScaleAIPOD642): success.
+
+root@pod641:~# vipu-admin list cluster
+ Cluster              | GW Topology | ILDs | ILD Topology | IPUs
+-----------------------------------------------------------------
+ KTHyperScaleAIPOD641 | LOOPED      | 1    | TORUS        | 64
+ KTHyperScaleAIPOD642 | LOOPED      | 1    | TORUS        | 64
+-----------------------------------------------------------------
+root@pod641:~#
+
+//Allocation을 만들지 않아서도 자동적으로 Allocation이 만들어 짐
+root@pod641:~# vipu-admin list allocations
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Cluster              | Allocation           | Agents
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+ KTHSAIPOD641-Cluster | KTHSAIPOD641-Cluster | ipum1 ipum10 ipum11 ipum12 ipum13 ipum14 ipum15 ipum16 ipum2 ipum3 ipum4 ipum5 ipum6 ipum7 ipum8 ipum9
+ KTHSAIPOD642-Cluster | KTHSAIPOD642-Cluster | ipum17 ipum18 ipum19 ipum20 ipum21 ipum22 ipum23 ipum24 ipum25 ipum26 ipum27 ipum28 ipum29 ipum30 ipum31 ipum32
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+root@pod641:~#
+
+
+ipuuser@pod641:~$ vipu-admin create user hakim --allocations KTHSAIPOD641-Cluster
+create user (hakim): success. Access key is "c^TebjZnykuD".
+vipu configuration file for the user "hakim" written: hakim.vipu-cli.hcl
+Use 'vipu --config hakim.vipu-cli.hcl' to switch to the user context.
+
+vipu-admin create user khu1 --allocations KTHSAIPOD641-Cluster
+vipu-admin create user quantumai --allocations KTHSAIPOD641-Cluster
+vipu-admin create user tak --allocations KTHSAIPOD641-Cluster
+
+vipu-admin create user jiwoongc --allocations KTHSAIPOD642-Cluster
+vipu-admin create user minkyuk --allocations KTHSAIPOD642-Cluster
+vipu-admin create user quantec1 --allocations KTHSAIPOD642-Cluster
+
+
+ipuuser@pod641:~$ ll
+total 176
+drwxr-xr-x 9 ipuuser ipugroup  4096 Jul  3 09:10 ./
+drwxr-xr-x 6 root    root      4096 Jan  3 13:20 ../
+-rw------- 1 ipuuser ipugroup 52829 Jul  3 08:14 .bash_history
+-rw-r--r-- 1 ipuuser ipugroup   220 Apr  5  2018 .bash_logout
+-rw-r--r-- 1 ipuuser ipugroup  3771 Apr  5  2018 .bashrc
+drwxr-xr-x 3 ipuuser ipugroup  4096 May 21  2021 .cache/
+drwx------ 3 ipuuser ipugroup  4096 Oct 15  2021 .config/
+-rw------- 1 ipuuser ipugroup   217 Jul  1  2021 config.hcl.20210701
+-rw------- 1 ipuuser ipugroup    94 Jul  3 09:08 hakim.vipu-cli.hcl
+drwxr-xr-x 3 ipuuser ipugroup  4096 Apr  6 12:45 IPU-M_releases/
+drwxr-xr-x 2 ipuuser ipugroup  4096 Nov 17  2021 .ipuof.conf.d/
+-rw------- 1 ipuuser ipugroup    96 Jul  3 09:09 jiwoongc.vipu-cli.hcl
+-rw------- 1 ipuuser ipugroup    92 Jul  3 09:08 khu1.vipu-cli.hcl
+-rw------- 1 ipuuser ipugroup    28 Aug 12  2021 .lesshst
+drwxr-xr-x 5 ipuuser ipugroup  4096 May 21  2021 .local/
+-rw------- 1 ipuuser ipugroup    94 Jul  3 09:09 minkyuk.vipu-cli.hcl
+-rw-r--r-- 1 ipuuser ipugroup   884 Sep  9  2021 .profile
+-rw-r--r-- 1 ipuuser ipugroup   446 Jul  1  2021 prometheus-sd-config.json.20210701
+-rw------- 1 ipuuser ipugroup    98 Sep 27  2021 .python_history
+-rw------- 1 ipuuser ipugroup    99 Jul  3 09:10 quantec1.vipu-cli.hcl
+-rw------- 1 ipuuser ipugroup    97 Jul  3 09:08 quantumai.vipu-cli.hcl
+-rw-r--r-- 1 ipuuser ipugroup   858 Jul  1  2021 rack_config.json.20210701
+drwxrwxr-x 3 ipuuser ipugroup  4096 Apr  7 13:06 .rack_tool/
+-rw------- 1 ipuuser ipugroup   132 Nov 18  2021 root.vipu-cli.hcl
+-rw-r--r-- 1 ipuuser ipugroup   139 May 21  2021 _sample.vipu-cli_hcl
+drwx------ 2 ipuuser ipugroup  4096 Aug  7  2021 .ssh/
+-rw------- 1 ipuuser ipugroup    90 Jul  3 09:09 tak.vipu-cli.hcl
+-rw------- 1 ipuuser ipugroup 10643 Apr 22 14:49 .viminfo
+-rw------- 1 ipuuser ipugroup  5471 Jul  1  2021 vipu-server.json.20210701
+
+
+
+ipuuser@pod641:~$ cat _sample.vipu-cli_hcl
+# generated by vipu-cli
+
+secure = false
+api-user-id = "mkbahk"
+api-access-key = "lYarfjMDLyxrvv"
+api-host = "10.1.3.101"
+api-port = "8090"
+ipuuser@pod641:~$
+
+root@pod641:~#cp or scp user.hcl ~user/
+
+cp user.hcl .vipu-cli.hcl
+vipu list allocations
+
+
+
