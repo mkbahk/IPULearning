@@ -50,6 +50,8 @@ gc-docker -- -ti -e POPLAR_LOG_LEVEL=TRACE graphcore/tensorflow:2 python3
 
 gc-docker -- --rm --shm-size=1g --ulimit stack=67108864 --ulimit memlock=-1 -v /etc/ipuof.conf.d/:/etc/ipuof.conf.d/ -v /home/mkbahk:/home/mkbahk --device=/dev/infiniband/ --device=/dev/infiniband/rdma_cm -ti {수행할 도커이미지 이름} /bin/bash
 
+//kbbahk라는 사용자 
+gc-docker -- --rm --shm-size=1g --ulimit stack=67108864 --ulimit memlock=-1 -v /etc/ipuof.conf.d/:/etc/ipuof.conf.d/ -v /localdata/home/kbbahk:/localdata/home/kbbahk -v /localdata/home/kbbahk/.ipuof.conf.d/pt-kbbahk-4-ipus.conf:/etc/ipuof.conf --device=/dev/infiniband/ --device=/dev/infiniband/rdma_cm -it graphcore/tensorflow:2-amd-2.5.1-ubuntu-18.04-20220628 /bin/bash
 
 
 //------------------------------------------
