@@ -18,3 +18,9 @@ export TMPDIR=/tmp
 source ~/poplar_sdk-ubuntu_18_04-2.4.0+856-d16ca54529/popart-ubuntu_18_04-2.4.0+2529-969064e2df/enable.sh
 source ~/poplar_sdk-ubuntu_18_04-2.4.0+856-d16ca54529/poplar-ubuntu_18_04-2.4.0+2529-969064e2df/enable.sh
 #
+#### set Graphcore IPU Poplar SDK 2.5
+export TF_POPLAR_FLAGS=--executable_cache_path=/tmp
+export TMPDIR=/tmp
+source ~/poplar_sdk-ubuntu_18_04-2.5.1+1001-64add8f33d/popart-ubuntu_18_04-2.5.1+4748-e94d646535/enable.sh
+source ~/poplar_sdk-ubuntu_18_04-2.5.1+1001-64add8f33d/popart-ubuntu_18_04-2.5.1+4748-e94d646535/enable.sh
+#
