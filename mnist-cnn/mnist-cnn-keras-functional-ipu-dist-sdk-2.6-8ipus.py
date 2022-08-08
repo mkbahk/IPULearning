@@ -60,7 +60,7 @@ def train_model(model):
     x_train, y_train, x_test, y_test = data_fn()
 
     # 훈련을 위해서 모델을 컴파일
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'], steps_per_execution=25)
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'], steps_per_execution=12)
 
     # 모델을 훈련하기
     model.fit(x=x_train, y=y_train, batch_size=batch_size, epochs=epochs)
