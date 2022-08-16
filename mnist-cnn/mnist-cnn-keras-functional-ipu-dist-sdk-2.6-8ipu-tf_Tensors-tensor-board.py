@@ -59,13 +59,13 @@ def train_model(model):
  
     tensorboard_callback = tf.keras.callbacks.TensorBoard(
         log_dir='/tmp/tblogs',
-        histogram_freq=0,
+        histogram_freq=1,
         write_graph=True,
-        write_images=False,
-        write_steps_per_second=False,
+        write_images=True,
+        write_steps_per_second=True,
         update_freq='epoch',
-        profile_batch=0,
-        embeddings_freq=0,
+        profile_batch=1,
+        embeddings_freq=1,
         embeddings_metadata=None
     ) #tensorboard --logdir="/tmp/tblogs --bind-all"
     # 데이타 얻기
