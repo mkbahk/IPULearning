@@ -17,6 +17,7 @@ from tensorflow.python import ipu
 num_classes = 10
 input_shape = (28, 28, 1)
 
+
 def data_fn():
     # 데이타를 훈련과 검증용으로 분리
     (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
@@ -55,7 +56,18 @@ def train_model(model):
     # 훈련용 하이퍼파라메터
     batch_size = 600
     epochs = 10000
-
+ 
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(
+        log_dir='/tmp/tblogs',
+        histogram_freq=0,
+        write_graph=True,
+        write_images=False,
+        write_steps_per_second=False,
+        update_freq='epoch',
+        profile_batch=0,
+        embeddings_freq=0,
+        embeddings_metadata=None
+    ) #tensorboard --logdir="/tmp/tblogs --bind-all"
     # 데이타 얻기
     x_train, y_train, x_test, y_test = data_fn()
 
@@ -63,7 +75,7 @@ def train_model(model):
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'], steps_per_execution=12)
 
     # 모델을 훈련하기
-    model.fit(x=x_train, y=y_train, batch_size=batch_size, epochs=epochs)
+    model.fit(x=x_train, y=y_train, batch_size=batch_size, epochs=epochs, callbacks=[tensorboard_callback])
 
     # 훈련된 모델을 평가하기
     eval_out = model.evaluate(x=x_test, y=y_test, batch_size=100)
