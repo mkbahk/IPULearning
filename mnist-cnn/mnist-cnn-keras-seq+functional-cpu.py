@@ -64,6 +64,29 @@ def functional_model_fn():
     return keras.Model(input_layer, output_layer)
 ### end of def:
 
+class SubclassModel(keras.Model):
+    def __init__(self, num_classes=10):
+        super(SubclassModel, self).__init__()
+        self.conv1 = layers.Conv2D(32, kernel_size=(3, 3), activation='relu')
+        self.pool1 = layers.MaxPooling2D(pool_size=(2, 2))
+        self.conv2 = layers.Conv2D(64, kernel_size=(3, 3), activation='relu')
+        self.pool2 = layers.MaxPooling2D(pool_size=(2, 2))
+        self.flatten = layers.Flatten()
+        self.dropout = layers.Dropout(0.5)
+        self.dense = layers.Dense(num_classes, activation='softmax')
+    #def
+        
+    def call(self, inputs):
+        x = self.conv1(inputs)
+        x = self.pool1(x)
+        x = self.conv2(x)
+        x = self.pool2(x)
+        x = self.flatten(x)
+        x = self.dropout(x)
+        return self.dense(x)
+    #def
+ #class
+
 def train_model(model):
     # 훈련용 하이퍼파라메터
     batch_size = 128
